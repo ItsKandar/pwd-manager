@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Mot de passe partagé{% endblock %}
+{% block content %}
+<h2>Mot de passe partagé</h2>
+<ul>
+  <li><strong>Label :</strong> {{ entry.label }}</li>
+  <li><strong>Login :</strong> {{ entry.login }}</li>
+  <li><strong>Mot de passe :</strong> {{ entry.password }}</li>
+  <li><strong>Catégorie :</strong> {{ entry.category }}</li>
+  <li><strong>Date de création :</strong> {{ entry.created_at }}</li>
+</ul>
+{% endblock %}

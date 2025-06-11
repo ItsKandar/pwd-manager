@@ -24,7 +24,7 @@
     <td>{{ entry.password }}</td>
     <td>{{ entry.category }}</td>
     <td>{{ entry.created_at }}</td>
-    <td><a href="{{ url_for('delete', id=entry.id) }}">Supprimer</a></td>
+    <td><a href="{{ url_for('delete', id=entry.id) }}">Supprimer</a> | <a href="{{ url_for('share', id=entry.id) }}">Partager</a></td>
   </tr>
   {% endfor %}
 </table>

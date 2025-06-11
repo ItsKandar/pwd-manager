@@ -1,8 +1,10 @@
+import secrets
+from datetime import datetime, timedelta
 from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
-from .models import User, PasswordEntry
+from .models import User, PasswordEntry, SharedPassword
 from .utils.encryption import encrypt, decrypt
 from .utils.password_generator import generate_password
 from flask import current_app as app
@@ -95,3 +97,49 @@ def register():
 def generate():
     new_password = generate_password()
     return {"password": new_password}
+
+@app.route("/share/<int:id>")
+@login_required
+def share(id):
+    entry = PasswordEntry.query.get_or_404(id)
+    if entry.user_id != current_user.id:
+        flash("Not authorized")
+        return redirect(url_for("dashboard"))
+
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.utcnow() + timedelta(minutes=10)
+
+    shared = SharedPassword(
+        token=token,
+        encrypted_password=entry.encrypted_password,
+        label=entry.label,
+        login=entry.login,
+        category=entry.category,
+        expires_at=expires_at
+    )
+    db.session.add(shared)
+    db.session.commit()
+
+    share_url = url_for("shared_view", token=token, _external=True)
+    flash(f"Lien de partage valide 10 min : {share_url}")
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/shared/<token>")
+def shared_view(token):
+    shared = SharedPassword.query.filter_by(token=token).first()
+    if not shared or shared.expires_at < datetime.utcnow():
+        return "Lien invalide ou expiré.", 404
+
+    try:
+        password = decrypt(shared.encrypted_password, current_user.username if current_user.is_authenticated else "public")
+    except:
+        password = "(Non déchiffrable ici)"
+
+    return render_template("shared.html", entry={
+        "label": shared.label,
+        "login": shared.login,
+        "password": password,
+        "category": shared.category,
+        "created_at": shared.created_at
+    })

@@ -17,3 +17,13 @@ class PasswordEntry(db.Model):
     encrypted_password = db.Column(db.LargeBinary)
     category = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+class SharedPassword(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(64), unique=True, nullable=False)
+    encrypted_password = db.Column(db.LargeBinary, nullable=False)
+    label = db.Column(db.String(100))
+    login = db.Column(db.String(100))
+    category = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)

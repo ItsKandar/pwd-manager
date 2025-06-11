@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<h2>Tableau de bord</h2>
+<p>Bienvenue, {{ current_user.username }} | <a href="{{ url_for('logout') }}">Déconnexion</a></p>
+
+<h3>Ajouter un mot de passe</h3>
+<form method="post" action="{{ url_for('add') }}">
+  <label>Label:</label> <input type="text" name="label">
+  <label>Login:</label> <input type="text" name="login">
+  <label>Mot de passe:</label> <input type="text" name="password" id="password-field">
+  <label>Catégorie:</label> <input type="text" name="category">
+  <button type="button" onclick="generatePassword()">Générer</button>
+  <button type="submit">Ajouter</button>
+</form>
+
+<h3>Mes mots de passe</h3>
+<table border="1">
+  <tr><th>Label</th><th>Login</th><th>Mot de passe</th><th>Catégorie</th><th>Créé le</th><th>Action</th></tr>
+  {% for entry in entries %}
+  <tr>
+    <td>{{ entry.label }}</td>
+    <td>{{ entry.login }}</td>
+    <td>{{ entry.password }}</td>
+    <td>{{ entry.category }}</td>
+    <td>{{ entry.created_at }}</td>
+    <td><a href="{{ url_for('delete', id=entry.id) }}">Supprimer</a></td>
+  </tr>
+  {% endfor %}
+</table>
+
+<script>
+function generatePassword() {
+  fetch("{{ url_for('generate') }}")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("password-field").value = data.password;
+    });
+}
+</script>
+{% endblock %}

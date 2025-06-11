@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Accueil{% endblock %}
+{% block content %}
+<h1>Bienvenue sur le gestionnaire de mots de passe</h1>
+<p><a href="{{ url_for('login') }}">Connexion</a> | <a href="{{ url_for('register') }}">Créer un compte</a></p>
+{% endblock %}
